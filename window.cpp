@@ -24,6 +24,7 @@ Window::Window(QWidget *parent) :
 
 
 
+
     //设置定时器
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(timeOut()));
@@ -49,7 +50,7 @@ void Window::GenerateRandomRect()
 
     QPen blackPen(Qt::black);
     blackPen.setWidth(1);
-    int rectWidth = sceneWidth/RectNum;
+    double rectWidth = sceneWidth/RectNum;
 
     for (int i = 0; i < RectNum; i++)
     {
@@ -97,6 +98,7 @@ void Window::on_sortingGenegate_clicked()
     this->GenerateRandomRect();
     scene->update();
 }
+
 
 void Window::timeOut()
 {

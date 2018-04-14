@@ -11,7 +11,7 @@ class sorting: public QObject
     Q_OBJECT
 public:
     sorting(QGraphicsRectItem **rectArray, QGraphicsScene *&scene, int RectNum, int sortIndex,
-            int sortSpeed, int sceneWidth, int sceneHeight);
+            int sortSpeed, double sceneWidth, int sceneHeight);
     ~sorting();
     void ShellSort();   //combo index is 7
     void QuickSort();   //6
@@ -36,7 +36,7 @@ private:
     int RectNum;
     int sortIndex;
     int sortSpeed;
-    int sceneWidth;
+    double sceneWidth;
     int sceneHeight;
 };
 

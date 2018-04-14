@@ -3,7 +3,7 @@
 #include <QDebug>
 
 sorting::sorting(QGraphicsRectItem **rectArray, QGraphicsScene *&scene, int RectNum,
-                 int sortIndex, int sortSpeed, int sceneWidth, int sceneHeight)
+                 int sortIndex, int sortSpeed, double sceneWidth, int sceneHeight)
     :rectArray(rectArray), scene(scene), RectNum(RectNum), sortIndex(sortIndex),
       sortSpeed(sortSpeed), sceneWidth(sceneWidth), sceneHeight(sceneHeight)
 {

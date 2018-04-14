@@ -38,7 +38,7 @@ private:
     int RectNum;// 10 - 500;             //排序数目
     QGraphicsRectItem **rectArray; //存放矩形元素指针的数组
     int sceneHeight;
-    int sceneWidth;
+    double sceneWidth;
     QTimer *timer;
     sorting *sort;
     unsigned long int timeCnt = 0;

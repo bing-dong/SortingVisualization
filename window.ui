@@ -138,6 +138,9 @@
          <property name="currentText">
           <string>100</string>
          </property>
+         <property name="currentIndex">
+          <number>2</number>
+         </property>
          <property name="iconSize">
           <size>
            <width>18</width>
@@ -275,7 +278,17 @@
     </layout>
    </item>
    <item>
-    <widget class="QGraphicsView" name="graphicsView"/>
+    <widget class="QGraphicsView" name="graphicsView">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
