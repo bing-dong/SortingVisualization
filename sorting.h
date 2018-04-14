@@ -10,7 +10,8 @@ class sorting: public QObject
 {
     Q_OBJECT
 public:
-    sorting(QGraphicsRectItem **rectArray, QGraphicsScene *scene, int RectNum, int sortIndex, int sortSpeed, QObject *parent = 0);
+    sorting(QGraphicsRectItem **rectArray, QGraphicsScene *&scene, int RectNum, int sortIndex,
+            int sortSpeed, int sceneWidth, int sceneHeight);
     ~sorting();
     void ShellSort();   //combo index is 7
     void QuickSort();   //6
@@ -22,18 +23,21 @@ public:
     void BubbleSort();  //0
     void AllSort();     //8
     void Delay_MSec(unsigned int msec);
+    void sortBegin();
 
 signals:
     void sortDone();
 
 protected:
-    //void run();
+    void run();
 private:
     QGraphicsRectItem **rectArray;
-    QGraphicsScene * &scene;
+    QGraphicsScene *&scene;
     int RectNum;
     int sortIndex;
     int sortSpeed;
+    int sceneWidth;
+    int sceneHeight;
 };
 
 #endif // SORTING_H

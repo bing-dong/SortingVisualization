@@ -14,8 +14,16 @@ Window::Window(QWidget *parent) :
     //建立场景
     scene = new QGraphicsScene();
     ui->graphicsView->setScene(scene);
-    sceneHeight = 600;//ui->graphicsView->size().height();
-    sceneWidth = 1100;//ui->graphicsView->size().width();
+//    ui->graphicsView->fitInView(scene->sceneRect());
+//    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    sceneHeight = ui->graphicsView->size().height();
+//    sceneWidth = ui->graphicsView->size().width();
+    sceneHeight = 600;
+    sceneWidth = 1100;
+
+
+
     //设置定时器
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(timeOut()));
@@ -45,7 +53,7 @@ void Window::GenerateRandomRect()
 
     for (int i = 0; i < RectNum; i++)
     {
-        rectArray[i] = this->scene->addRect(i*(rectWidth), 600, rectWidth, -rectHeight[i], blackPen, QBrush(Qt::blue));
+        rectArray[i] = this->scene->addRect(i*(rectWidth), sceneHeight, rectWidth, -rectHeight[i], blackPen, QBrush(Qt::blue));
     }
     delete[] rectHeight;
 }
@@ -58,13 +66,14 @@ void Window::on_button_begin_clicked()
         ui->button_begin->setText("结束");
         int sortIndex = ui->sortingWay->currentIndex();
         int sortSpeed = ui->sortingSpeed->currentText().toInt();
-        //排序
-        sort = new sorting(rectArray, scene, RectNum, sortIndex, sortSpeed);
-        //sort->start();
-        connect(sort, SIGNAL(sortDone()), this, SLOT(sortDone()));
 
+        sort = new sorting(rectArray, scene, RectNum, sortIndex, sortSpeed, sceneWidth, sceneHeight);
+        //sort->start();  //线程开始
+        connect(sort, SIGNAL(sortDone()), this, SLOT(sortDone()));
         //启动定时器
         timer->start(10);
+        //开始排序
+        sort->sortBegin();
     }
     else if (ui->button_begin->text() == "结束")
     {
@@ -86,6 +95,7 @@ void Window::on_sortingGenegate_clicked()
         rectArray = NULL;
     }
     this->GenerateRandomRect();
+    scene->update();
 }
 
 void Window::timeOut()
