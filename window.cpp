@@ -10,7 +10,7 @@ Window::Window(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    this->setWindowTitle("可视化排序");
+    this->setWindowTitle("排序可视化");
     //建立场景
     scene = new QGraphicsScene();
     ui->graphicsView->setScene(scene);

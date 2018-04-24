@@ -6,6 +6,18 @@
 #include <QThread>
 #include <QTime>
 
+typedef struct node
+{
+    int height;
+//    struct node *next;
+//    QGraphicsRectItem rect;
+    struct node *next;
+}Node;
+
+typedef struct bucket {
+    Node *radix[10] = { NULL };
+}Bucket;
+
 class sorting: public QObject
 {
     Q_OBJECT

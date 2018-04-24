@@ -73,10 +73,14 @@ sorting::~sorting()
 
 }
 
+//此函数可设置矩形位置和大小
+//rectArray[0]->setRect(0, sceneHeight, sceneWidth/RectNum, -30);
+
 void sorting::BubbleSort()  //0
 {
     QPen blackPen(Qt::black);
     blackPen.setWidth(1);
+    QGraphicsRectItem *rect = NULL;
 
     for (int i=0; i<RectNum-1; i++)
     {
@@ -84,7 +88,7 @@ void sorting::BubbleSort()  //0
         {
             if (-rectArray[j]->boundingRect().height() > -rectArray[j+1]->boundingRect().height())
             {
-                QGraphicsRectItem *rect = rectArray[j];
+                rect = rectArray[j];
                 scene->removeItem(rectArray[j]);
                 //rectArray[j]->boundingRect().height()获取的高度是负值，而且获取的并不是真实高度，
                 //获取值-1的绝对值才是真实的高度
@@ -104,6 +108,7 @@ void sorting::BubbleSort()  //0
             Delay_MSec(sortSpeed);
         }
     }
+    delete rect;
     rectArray[0]->setBrush(QColor(0,255,0));
     scene->update();
     emit sortDone();
@@ -113,6 +118,7 @@ void sorting::SelectionSort()//1
 {
     QPen blackPen(Qt::black);
     blackPen.setWidth(1);
+    QGraphicsRectItem *rect = NULL;
 
     for (int i=0; i<RectNum-1; i++)
     {
@@ -132,7 +138,7 @@ void sorting::SelectionSort()//1
 
         if (pos != i)
         {
-            QGraphicsRectItem *rect = rectArray[i];
+            rect = rectArray[i];
             scene->removeItem(rectArray[i]);
             rectArray[i] = scene->addRect(i*sceneWidth/RectNum, sceneHeight, sceneWidth/RectNum,
                            rectArray[pos]->boundingRect().height()-1, blackPen, QBrush(Qt::green));
@@ -147,6 +153,7 @@ void sorting::SelectionSort()//1
             scene->update();
         }
     }
+    delete rect;
     rectArray[RectNum-1]->setBrush(QColor(0,255,0));
     //scene->update();
     emit sortDone();
@@ -154,28 +161,100 @@ void sorting::SelectionSort()//1
 
 void sorting::InsertionSort()//2
 {
+    QPen blackPen(Qt::black);
+    blackPen.setWidth(1);
+    QGraphicsRectItem *rect = NULL;
+
+    for (int i=1; i<RectNum; i++)
+    {
+        rect = rectArray[i];
+        for (int j=i; j>0; j--)
+        {
+            //此位置比前一位置的元素小，则向前插入
+            if (-rect->boundingRect().height() < -rectArray[j-1]->boundingRect().height())
+            {
+                scene->removeItem(rectArray[j]);
+                rectArray[j] = scene->addRect(j*sceneWidth/RectNum, sceneHeight, sceneWidth/RectNum,
+                               rectArray[j-1]->boundingRect().height()-1, blackPen, QBrush(Qt::green));
+                scene->removeItem(rectArray[j-1]);
+                rectArray[j-1] = scene->addRect((j-1)*sceneWidth/RectNum, sceneHeight, sceneWidth/RectNum,
+                               rect->boundingRect().height()-1, blackPen, QBrush(Qt::red));
+                scene->update();
+                Delay_MSec(sortSpeed);
+                rectArray[j-1]->setBrush(QColor(0,255,0));
+            }
+            //当最后一个最高时，在上述程序中将其移除，但没有填补，在此进行原处插入
+            else if (i == RectNum-1 && j == RectNum-1)
+            {
+                rectArray[j] = scene->addRect(j*sceneWidth/RectNum, sceneHeight, sceneWidth/RectNum,
+                                              rectArray[j]->boundingRect().height()-1, blackPen, QBrush(Qt::green));
+            }
+        }
+    }
+
+
+    rectArray[0]->setBrush(QColor(0,255,0));
+    scene->update();
+    delete rect;
+    emit sortDone();
+}
+
+//RadixSort的添加节点函数
+void addNode(Node* &node, int height)
+{
+    Node *t = node;
+    if (t == NULL)
+    {
+        node = (Node*)malloc(sizeof(Node));
+        node->height = height;
+        node->next = NULL;
+    }
+    else
+    {
+        while (t->next)
+        {
+            t = t->next;
+        }
+        t->next = (Node*)malloc(sizeof(Node));
+        t->next->height = height;
+        t->next->next = NULL;
+    }
 
 }
 
 void sorting::RadixSort()//3
 {
-    QPen blackPen(Qt::black);
-    blackPen.setWidth(1);
+    Bucket bucket;
 
-    for (int i=1; i<RectNum; i++)
+    for (int i = 1; i <= 100; i *= 10)
     {
-        QGraphicsRectItem *rect = rectArray[i];
-        scene->removeItem(rectArray[i]);
-
-        for (int j=0; j<i; j++)
+        //分配
+        for (int j = 0; j<RectNum; j++)
         {
-            if (-rectArray[i]->boundingRect().height() < -rectArray[j]->boundingRect().height())
-            {
+            int n = ((int)(-rectArray[j]->boundingRect().height()) / i) % 10 ;
+            addNode(bucket.radix[n], rectArray[j]->boundingRect().height());//创建值为a[j]的节点，并将其加入头节点为radix[n]的链表中
+            Delay_MSec(sortSpeed);
+        }
 
+        //回收
+        int n = 0;
+        for (int j = 0; j<10; j++)
+        {
+            Node *t = bucket.radix[j];
+            Node *temp;
+            while (t != NULL)
+            {
+                temp = t;
+                rectArray[n++]->setRect(n*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, t->height-1);
+                scene->update();
+                t = t->next;
+                free(temp);
             }
-            //
+            bucket.radix[j] = NULL;
+            Delay_MSec(sortSpeed);
         }
     }
+    emit sortDone();
 }
 
 void sorting::HeapSort()//4
