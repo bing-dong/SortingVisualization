@@ -25,15 +25,16 @@ public:
     sorting(QGraphicsRectItem **rectArray, QGraphicsScene *&scene, int RectNum, int sortIndex,
             int sortSpeed, double sceneWidth, int sceneHeight);
     ~sorting();
-    void ShellSort();   //combo index is 7
-    void QuickSort();   //6
-    void MergeSort();   //5
-    void HeapSort();    //4
+    void ShellSort(QGraphicsRectItem* ary[], int len);   //combo index is 7
+    void QuickSort(QGraphicsRectItem* s[], int l, int r);   //6
+    void MergeSort(QGraphicsRectItem* a[], int left, int right);   //5
+    void Merge(QGraphicsRectItem* a[], int left, int mid, int right);//5
+    void MaxHeapFixDown(QGraphicsRectItem* a[], int i, int n); //4
+    void HeapSort(QGraphicsRectItem* a[], int n);    //4
     void RadixSort();   //3
     void InsertionSort();//2
     void SelectionSort();//1
     void BubbleSort();  //0
-    void AllSort();     //8
     void Delay_MSec(unsigned int msec);
     void sortBegin();
 
