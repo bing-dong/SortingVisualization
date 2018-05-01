@@ -31,3 +31,4 @@ HEADERS  += window.h \
     sorting.h
 
 FORMS    += window.ui
+

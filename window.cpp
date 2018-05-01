@@ -14,27 +14,16 @@ Window::Window(QWidget *parent) :
     //建立场景
     scene = new QGraphicsScene();
     ui->graphicsView->setScene(scene);
-//    ui->graphicsView->fitInView(scene->sceneRect());
-//    ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    sceneHeight = ui->graphicsView->size().height();
-//    sceneWidth = ui->graphicsView->size().width();
     sceneHeight = 600;
     sceneWidth = 1100;
-
-
-
 
     //设置定时器
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()), this, SLOT(timeOut()));
-    //connect(sort, SIGNAL(sortDone()), this, SLOT(sortDone()));
+    //开始按钮不可用
+    ui->button_begin->setDisabled(true);
 }
 
-Window::~Window()
-{
-    delete ui;
-}
 
 void Window::GenerateRandomRect()
 {
@@ -65,20 +54,27 @@ void Window::on_button_begin_clicked()
     if (ui->button_begin->text() == "开始")
     {
         ui->button_begin->setText("结束");
+        //排序时禁止‘排序生成’按钮
+        ui->sortingGenegate->setDisabled(true);
         int sortIndex = ui->sortingWay->currentIndex();
-        int sortSpeed = ui->sortingSpeed->currentText().toInt();
+        int sortSpeed = getSpeed();
 
         sort = new sorting(rectArray, scene, RectNum, sortIndex, sortSpeed, sceneWidth, sceneHeight);
-        //sort->start();  //线程开始
+        //Qt::BlockingQueuedConnection多线程中排队
+        connect(sort, SIGNAL(setRect(int,int)), this, SLOT(setRect(int,int)), Qt::BlockingQueuedConnection);
         connect(sort, SIGNAL(sortDone()), this, SLOT(sortDone()));
+        sort->start();  //线程开始排序
         //启动定时器
         timer->start(10);
-        //开始排序
-        sort->sortBegin();
     }
     else if (ui->button_begin->text() == "结束")
     {
         ui->button_begin->setText("开始");
+        //排序结束启用‘排序生成’按钮
+        ui->sortingGenegate->setEnabled(true);
+        //开始按钮不可用
+        ui->button_begin->setDisabled(true);
+        sort->quit();
         stopTimer();
     }
 }
@@ -97,8 +93,26 @@ void Window::on_sortingGenegate_clicked()
     }
     this->GenerateRandomRect();
     scene->update();
+
+    //开始按钮可用
+    ui->button_begin->setEnabled(true);
 }
 
+int Window::getSpeed()
+{
+    switch (ui->sortingSpeed->currentText().toInt()){
+        case 1: return 100;
+        case 2: return 10;
+        case 3: return 1;
+        default: return 1;
+    }
+}
+
+void Window::setRect(int x, int h)
+{
+    rectArray[x]->setRect(x*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, h);
+    scene->update();
+}
 
 void Window::timeOut()
 {
@@ -115,8 +129,16 @@ void Window::stopTimer()
 
 void Window::sortDone()
 {
-    //sort->quit();//停止排序线程
-    //sort->wait();
+//    sort->terminate();
+//    sort->wait();
+    sort->quit();
     timer->stop();//停止计时
     timeCnt = 0;
+}
+
+Window::~Window()
+{
+    delete ui;
+//    sort->terminate();
+//    sort->wait();
 }

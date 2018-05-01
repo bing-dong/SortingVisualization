@@ -4,13 +4,10 @@
 #include <QCoreApplication>
 #include <QWidget>
 #include <QThread>
-#include <QTime>
 
 typedef struct node
 {
     int height;
-//    struct node *next;
-//    QGraphicsRectItem rect;
     struct node *next;
 }Node;
 
@@ -18,7 +15,7 @@ typedef struct bucket {
     Node *radix[10] = { NULL };
 }Bucket;
 
-class sorting: public QObject
+class sorting: public QThread
 {
     Q_OBJECT
 public:
@@ -35,17 +32,17 @@ public:
     void InsertionSort();//2
     void SelectionSort();//1
     void BubbleSort();  //0
-    void Delay_MSec(unsigned int msec);
-    void sortBegin();
+
 
 signals:
     void sortDone();
+    void setRect(int x, int h);
 
 protected:
-    void run();
+    void run() override;
 private:
     QGraphicsRectItem **rectArray;
-    QGraphicsScene *&scene;
+    QGraphicsScene* &scene;
     int RectNum;
     int sortIndex;
     int sortSpeed;

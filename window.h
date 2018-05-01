@@ -19,20 +19,19 @@ public:
     explicit Window(QWidget *parent = 0);
     ~Window();
 
-signals:
-
-
-
 private slots:
     void on_button_begin_clicked();
     void timeOut();
     void on_sortingGenegate_clicked();
     void sortDone();
+    void setRect(int x, int h);
+
 
 private:
     Ui::Window *ui;
     void GenerateRandomRect();
     void stopTimer();
+    int getSpeed();
     QGraphicsScene *scene;
     QGraphicsRectItem *rect;
     int RectNum;// 10 - 500;             //排序数目

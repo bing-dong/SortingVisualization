@@ -7,41 +7,9 @@ sorting::sorting(QGraphicsRectItem **rectArray, QGraphicsScene *&scene, int Rect
     :rectArray(rectArray), scene(scene), RectNum(RectNum), sortIndex(sortIndex),
       sortSpeed(sortSpeed), sceneWidth(sceneWidth), sceneHeight(sceneHeight)
 {
-//    this->rectArray = rectArray;
-//    this->scene = scene;
-//    this->RectNum = RectNum;
-//    this->sortIndex = sortIndex;
-//    this->sortSpeed = sortSpeed;
-//    this->sceneWidth = sceneWidth;
-//    this->sceneHeight = sceneHeight;
 }
 
-//void sorting::run()
-//{
-//    switch (sortIndex) {
-//    case 0:
-//        BubbleSort(); break;
-//    case 1:
-//        SelectionSort(); break;
-//    case 2:
-//        InsertionSort(); break;
-//    case 3:
-//        RadixSort(); break;
-//    case 4:
-//        HeapSort(); break;
-//    case 5:
-//        MergeSort(); break;
-//    case 6:
-//        QuickSort(); break;
-//    case 7:
-//        ShellSort(); break;
-//    default:
-//        break;
-//    }
-//}
-
-void sorting::sortBegin()
-//void sorting::run()
+void sorting::run()
 {
     switch (sortIndex) {
     case 0:
@@ -83,9 +51,7 @@ sorting::~sorting()
 
 void sorting::BubbleSort()  //0
 {
-    QPen blackPen(Qt::black);
-    blackPen.setWidth(1);
-    QGraphicsRectItem *rect = NULL;
+    int h;
 
     for (int i=0; i<RectNum-1; i++)
     {
@@ -93,36 +59,31 @@ void sorting::BubbleSort()  //0
         {
             if (-rectArray[j]->boundingRect().height() > -rectArray[j+1]->boundingRect().height())
             {
-                rect = rectArray[j];
-                scene->removeItem(rectArray[j]);
-                //rectArray[j]->boundingRect().height()获取的高度是负值，而且获取的并不是真实高度，
-                //获取值-1的绝对值才是真实的高度
-                rectArray[j] = scene->addRect(j*sceneWidth/RectNum, sceneHeight, sceneWidth/RectNum,
-                               rectArray[j+1]->boundingRect().height()-1, blackPen, QBrush(Qt::blue));
-                scene->removeItem(rectArray[j+1]);
-                rectArray[j+1] = scene->addRect((j+1)*sceneWidth/RectNum, sceneHeight, sceneWidth/RectNum,
-                               rect->boundingRect().height()-1, blackPen, QBrush(Qt::green));
-                scene->update();
+                h = rectArray[j]->boundingRect().height();
+                emit setRect(j, rectArray[j+1]->boundingRect().height()-1);
+                rectArray[j]->setBrush(QColor(0,0,255));
+                emit setRect(j+1, h-1);
+                rectArray[j+1]->setBrush(QColor(0,255,0));
+
             }
             else
             {
                 rectArray[j]->setBrush(QColor(0,0,255));
                 rectArray[j+1]->setBrush(QColor(0,255,0));
-                scene->update();
+//                scene->update();
+                emit setRect(0, rectArray[0]->boundingRect().height()-1);
             }
-            Delay_MSec(sortSpeed);
+            msleep(sortSpeed);
         }
     }
-    delete rect;
     rectArray[0]->setBrush(QColor(0,255,0));
-    scene->update();
+//    scene->update();
+    emit setRect(0, rectArray[0]->boundingRect().height()-1);
 }
 
 void sorting::SelectionSort()//1
 {
-    QPen blackPen(Qt::black);
-    blackPen.setWidth(1);
-    QGraphicsRectItem *rect = NULL;
+    int h;
 
     for (int i=0; i<RectNum-1; i++)
     {
@@ -133,71 +94,62 @@ void sorting::SelectionSort()//1
             {
                 pos = j;
             }
-            //Delay_MSec(sortSpeed);
         }
 
         rectArray[pos]->setBrush(QColor(0,255,0));//找到最小值标记绿色
         scene->update();
-        Delay_MSec(sortSpeed*(RectNum-i));//等效位内层for循环的延时
+        msleep(sortSpeed*(RectNum-i));//等效位内层for循环的延时
 
         if (pos != i)
         {
-            rect = rectArray[i];
-            scene->removeItem(rectArray[i]);
-            rectArray[i] = scene->addRect(i*sceneWidth/RectNum, sceneHeight, sceneWidth/RectNum,
-                           rectArray[pos]->boundingRect().height()-1, blackPen, QBrush(Qt::green));
-            scene->removeItem(rectArray[pos]);
-            rectArray[pos] = scene->addRect((pos)*sceneWidth/RectNum, sceneHeight, sceneWidth/RectNum,
-                           rect->boundingRect().height()-1, blackPen, QBrush(Qt::blue));
-            scene->update();
+            h = rectArray[i]->boundingRect().height();
+            emit setRect(i, rectArray[pos]->boundingRect().height()-1);
+            rectArray[i]->setBrush(QColor(0,255,0));
+            emit setRect(pos, h-1);
+            rectArray[pos]->setBrush(QColor(0,0,255));
+            //scene->update();
+            emit setRect(0, rectArray[0]->boundingRect().height()-1);
         }
         else
         {
             rectArray[pos]->setBrush(QColor(0,255,0));
-            scene->update();
+            //scene->update();
+            emit setRect(0, rectArray[0]->boundingRect().height()-1);
         }
     }
-    delete rect;
     rectArray[RectNum-1]->setBrush(QColor(0,255,0));
 }
 
 void sorting::InsertionSort()//2
 {
-    QPen blackPen(Qt::black);
-    blackPen.setWidth(1);
-    QGraphicsRectItem *rect = NULL;
+    int h;
 
     for (int i=1; i<RectNum; i++)
     {
-        rect = rectArray[i];
+        h = rectArray[i]->boundingRect().height();
         for (int j=i; j>0; j--)
         {
             //此位置比前一位置的元素小，则向前插入
-            if (-rect->boundingRect().height() < -rectArray[j-1]->boundingRect().height())
+            if (-h < -rectArray[j-1]->boundingRect().height())
             {
-                scene->removeItem(rectArray[j]);
-                rectArray[j] = scene->addRect(j*sceneWidth/RectNum, sceneHeight, sceneWidth/RectNum,
-                               rectArray[j-1]->boundingRect().height()-1, blackPen, QBrush(Qt::green));
-                scene->removeItem(rectArray[j-1]);
-                rectArray[j-1] = scene->addRect((j-1)*sceneWidth/RectNum, sceneHeight, sceneWidth/RectNum,
-                               rect->boundingRect().height()-1, blackPen, QBrush(Qt::red));
-                scene->update();
-                Delay_MSec(sortSpeed);
+                emit setRect(j, rectArray[j-1]->boundingRect().height()-1);
+                rectArray[j]->setBrush(QColor(0,255,0));
+                emit setRect(j-1, h-1);
+                rectArray[j-1]->setBrush(QColor(255,0,0));
+                //scene->update();
+                emit setRect(0, rectArray[0]->boundingRect().height()-1);
+
+                msleep(sortSpeed);
                 rectArray[j-1]->setBrush(QColor(0,255,0));
             }
-            //当最后一个最高时，在上述程序中将其移除，但没有填补，在此进行原处插入
-            else if (i == RectNum-1 && j == RectNum-1)
-            {
-                rectArray[j] = scene->addRect(j*sceneWidth/RectNum, sceneHeight, sceneWidth/RectNum,
-                                              rectArray[j]->boundingRect().height()-1, blackPen, QBrush(Qt::green));
-            }
+
         }
     }
 
-
+    rectArray[RectNum-1]->setBrush(QColor(0,255,0));
     rectArray[0]->setBrush(QColor(0,255,0));
-    scene->update();
-    delete rect;
+    //scene->update();
+    emit setRect(0, rectArray[0]->boundingRect().height()-1);
 }
 
 //RadixSort的添加节点函数
@@ -235,7 +187,7 @@ void sorting::RadixSort()//3
         {
             int n = ((int)(-rectArray[j]->boundingRect().height()) / i) % 10 ;
             addNode(bucket.radix[n], rectArray[j]->boundingRect().height());//创建值为a[j]的节点，并将其加入头节点为radix[n]的链表中
-            Delay_MSec(sortSpeed);
+            msleep(sortSpeed);
         }
 
         //回收
@@ -247,13 +199,15 @@ void sorting::RadixSort()//3
             while (t != NULL)
             {
                 temp = t;
-                rectArray[n++]->setRect(n*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, t->height-1);
-                scene->update();
+//                rectArray[n]->setRect(n*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, t->height-1);
+//                scene->update();
+                emit setRect(n, t->height-1);
+                n++;
                 t = t->next;
                 free(temp);
             }
             bucket.radix[j] = NULL;
-            Delay_MSec(sortSpeed);
+            msleep(sortSpeed);
         }
     }
 }
@@ -271,17 +225,17 @@ void sorting::MaxHeapFixDown(QGraphicsRectItem* a[], int i, int n)
             break;
         else
         {
-            //a[i] = a[j];
-            a[i]->setRect(i*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, a[j]->boundingRect().height()-1);
-            scene->update();
+//            a[i]->setRect(i*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, a[j]->boundingRect().height()-1);
+//            scene->update();
+            emit setRect(i, a[j]->boundingRect().height()-1);
             i = j;
             j = 2*i+1;
         }
-        Delay_MSec(sortSpeed);
+        msleep(sortSpeed);
     }
-    a[i]->setRect(i*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, temp-1);
-    scene->update();
-    //a[i] = temp;
+//    a[i]->setRect(i*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, temp-1);
+    //scene->update();
+    emit setRect(i, temp-1);
 }
 
 //堆排序
@@ -293,16 +247,16 @@ void sorting::HeapSort(QGraphicsRectItem* a[], int n)//4
     {
         //swap(a[i], a[0]);
         int t = a[i]->boundingRect().height();
-        a[i]->setRect(i*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, a[0]->boundingRect().height()-1);
+        emit setRect(i, a[0]->boundingRect().height()-1);
         a[i]->setBrush(QColor(0,255,0));
-        a[0]->setRect(0, sceneHeight, sceneWidth/RectNum, t-1);
-        scene->update();
+        emit setRect(0, t-1);
 
         MaxHeapFixDown(a, 0, i);
-        Delay_MSec(sortSpeed);
+        msleep(sortSpeed);
     }
     a[0]->setBrush(QColor(0,255,0));
-    scene->update();
+    //替代scene->update();
+    emit setRect(0, a[0]->boundingRect().height()-1);
 }
 
 //两数组合并
@@ -320,25 +274,24 @@ void sorting::Merge(QGraphicsRectItem* a[], int left, int mid, int right)
         {
             height[n++] = a[m++]->boundingRect().height();
         }
-        Delay_MSec(sortSpeed);
+        msleep(sortSpeed);
     }
 
     while (l < mid)
     {
         height[n++] = a[l++]->boundingRect().height();
-        Delay_MSec(sortSpeed);
+        msleep(sortSpeed);
     }
     while (m <= right)
     {
         height[n++] = a[m++]->boundingRect().height();
-        Delay_MSec(sortSpeed);
+        msleep(sortSpeed);
     }
 
     for (int k = left, j =  0; k <= right; k++)
     {
-        a[k]->setRect(k*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, height[j++]-1);
-        scene->update();
-        Delay_MSec(sortSpeed);
+        emit setRect(k, height[j++]-1);
+        msleep(sortSpeed);
     }
     free(height);
 }
@@ -367,30 +320,30 @@ void sorting::QuickSort(QGraphicsRectItem* s[], int l, int r)//6
             while(i < j && -s[j]->boundingRect().height() >= -x) // 从右向左找第一个小于x的数
             {
                 j--;
-                Delay_MSec(sortSpeed);
+                msleep(sortSpeed);
             }
 
             if(i < j)
             {
-                s[i]->setRect(i*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, s[j]->boundingRect().height()-1);
+//                s[i]->setRect(i*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, s[j]->boundingRect().height()-1);
+                emit setRect(i, s[j]->boundingRect().height()-1);
                 i++;
-                scene->update();
             }
 
             while(i < j && -s[i]->boundingRect().height() < -x) // 从左向右找第一个大于等于x的数
             {
                 i++;
-                Delay_MSec(sortSpeed);
+                msleep(sortSpeed);
             }
             if(i < j)
             {
-                s[j]->setRect(j*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, s[i]->boundingRect().height()-1);
+//                s[j]->setRect(j*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, s[i]->boundingRect().height()-1);
+                emit setRect(j, s[i]->boundingRect().height()-1);
                 j--;
-                scene->update();
             }
         }
-        s[i]->setRect(i*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, x-1);
-        scene->update();
+
+        emit setRect(i, x-1);
         QuickSort(s, l, i - 1); // 递归调用
         QuickSort(s, i + 1, r);
     }
@@ -407,27 +360,19 @@ void sorting::ShellSort(QGraphicsRectItem* ary[], int len)//7
                     int k = i - gap;
                     int tmp = ary[i]->boundingRect().height();
                     while (k >= 0 && -ary[k]->boundingRect().height() > -tmp)
-                    {
-                        ary[k+gap]->setRect((k+gap)*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, ary[k]->boundingRect().height()-1);
-                        ary[k]->setRect(k*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, 0);
-                        scene->update();
+                    {              
+                        emit setRect(k+gap, ary[k]->boundingRect().height()-1);
+                        emit setRect(k, 0);
+                        //发射的信号需要顺序执行，故window.cpp中的信号链接方式需要用Qt::BlockingQueuedConnection
                         k -= gap;
-                        Delay_MSec(sortSpeed);
+                        msleep(sortSpeed);
                     }
-                    ary[k+gap]->setRect((k+gap)*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, tmp-1);
-                    scene->update();
+                    //ary[k+gap]->setRect((k+gap)*(sceneWidth/RectNum), sceneHeight, sceneWidth/RectNum, tmp-1);
+                    emit setRect(k+gap, tmp-1);
                 }
             }
         }
 }
 
-void sorting::Delay_MSec(unsigned int msec)
-{
-    QTime _Timer = QTime::currentTime().addMSecs(msec);
-
-    while( QTime::currentTime() < _Timer )
-
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-}
 
 
